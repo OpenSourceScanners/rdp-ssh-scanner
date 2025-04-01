@@ -6,7 +6,7 @@ def check_rdp(ip, port):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.settimeout(1)
             if s.connect_ex((ip, port)) == 0:
-                s.send(b"\x03\x00\x00\x13\x0e\xe0\x00\x00\x00\x00\x00\x01\x00\x08\x00\x03\x00\x00\x00")  # Proper RDP negotiation request
+                s.send(b"\x03\x00\x00\x13\x0e\xe0\x00\x00\x00\x00\x00\x01\x00\x08\x00\x03\x00\x00\x00") # rdp negotiation request
                 response = s.recv(1024)
                 if response and len(response) > 3 and response[:1] == b"\x03":
                     print(f"[+] RDP service detected on {ip}:{port}")
@@ -18,7 +18,7 @@ def check_ssh(ip, port):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.settimeout(1)
             if s.connect_ex((ip, port)) == 0:
-                s.send(b"SSH-2.0-Check\r\n")  # Basic SSH handshake initiation
+                s.send(b"SSH-2.0-Check\r\n") # ssh handshake
                 response = s.recv(1024)
                 if response and b"SSH-" in response:
                     print(f"[+] SSH service detected on {ip}:{port}")
@@ -29,11 +29,11 @@ def scan_ports(ip, mode):
     if mode == "rdp":
         print(f"Scanning {ip} for open RDP ports (1-9999)...")
         scanner = check_rdp
-        port_range = range(6000, 8000)
+        port_range = range(1, 9999)
     elif mode == "ssh":
         print(f"Scanning {ip} for open SSH ports (1-9999)...")
         scanner = check_ssh
-        port_range = [1, 9999]  # Common SSH ports
+        port_range = [1, 9999] # going through all 4 digit ports
     else:
         print("Invalid mode selected.")
         return
